@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title>Juego del Ahorcado</title>
+		<title>CANVAS Ahorcado</title>
 		<style>
 			body
 			{
@@ -31,18 +31,15 @@
 			var inicioY = 300;
 			var lon = 35;
 			var margen = 20;
-
 			//Arreglos
 			var teclas_array = new Array();
 			var letras_array = new Array();
 			var palabras_array = new Array();
-
 			//Variables de control
 			var aciertos = 0;
 			var errores = 0;
-
-			// Agregar palabras a adivinar, en el arreglo palabras_array
-			palabras_array.push("luz");
+			//
+			palabras_array.push("PEGASO");
 			palabras_array.push("AFRODITA");
 			palabras_array.push("ATENEA");
 			palabras_array.push("HARES");
@@ -52,10 +49,8 @@
 			palabras_array.push("PERSEO");
 			palabras_array.push("POSEIDON");
 			palabras_array.push("APOLO");
-
 			//
-			function Tecla(x, y, ancho, alto, letra)
-			{
+			function Tecla(x, y, ancho, alto, letra){
 				this.x = x;
 				this.y = y;
 				this.ancho = ancho;
@@ -63,7 +58,6 @@
 				this.letra = letra;	
 				this.dibuja = dibujaTecla;
 			}
-
 			function Letra(x, y, ancho, alto, letra)
 			{
 				this.x = x;
@@ -74,11 +68,8 @@
 				this.dibuja = dibujaCajaLetra;
 				this.dibujaLetra = dibujaLetraLetra;
 			}
-
 			function dibujaTecla()
 			{
-				var w = this.ancho;
-				var h = this.alto;
 				ctx.fillStyle = colorTecla;
 				ctx.strokeStyle = colorMargen;
 				ctx.fillRect(this.x, this.y, this.ancho, this.alto);
@@ -86,9 +77,15 @@
 				//
 				ctx.fillStyle = "white";
 				ctx.font = "bold 20px Courier";
-				ctx.fillText(this.letra, this.x+w/2-5, this.y+h/2+5);
+				ctx.fillText(this.letra, this.x+this.ancho/2-5, this.y+this.alto/2+5);
+				
 			}
-
+			function dibujaLetraLetra()
+			{
+				ctx.fillStyle = "black";
+				ctx.font = "bold 40px Courier";
+				ctx.fillText(this.letra, this.x+this.ancho/2-15, this.y+this.alto/2+14);
+			}
 			function dibujaCajaLetra()
 			{
 				ctx.fillStyle = "white";
@@ -96,7 +93,6 @@
 				ctx.fillRect(this.x, this.y, this.ancho, this.alto);
 				ctx.strokeRect(this.x, this.y, this.ancho, this.alto);
 			}
-
 			/*** FUNCiONES **/
 			function teclado()
 			{
@@ -131,7 +127,62 @@
 					y = inicioY + ren * 50;
 				}
 			}
-            
+			function pintaPalabra()
+			{
+				var p = Math.floor(Math.random()*palabras_array.length);
+				palabra = 	palabras_array[p];
+				var ren = 0;
+				var col = 0;
+				var y = 230;
+				var lon = 50;
+				var x = (canvas.width - (lon+margen) * palabra.length)/2;
+				for(var i=0; i<palabra.length; i++)
+				{
+					letra = palabra.substr(i,1);
+					miLetra = new Letra(x, y, lon, lon, letra);
+					miLetra.dibuja();
+					letras_array.push(miLetra);
+					x += lon + margen;
+				}
+			}
+			function cadalso(errores)
+			{
+				var imagen = new Image();
+				imagen.src = "imagenes/ahorcado/ahorcado"+errores+".png";
+				imagen.onload = function(){
+					ctx.drawImage(imagen,390,20,180,180);	
+				}
+			}
+			function ajusta(xx, yy)
+			{
+				var posCanvas = canvas.getBoundingClientRect();
+				var x = xx - posCanvas.left;
+				var y = yy - posCanvas.top;
+				return {x:x, y:y}
+				
+			}
+			function selecciona(e)
+			{
+				var pos = ajusta(e.clientX, e.clientY);	
+				var x = pos.x;
+				var y = pos.y;
+				var tecla;
+				var bandera = false;
+				for(var i=0; i<teclas_array.length; i++)
+				{
+					tecla = teclas_array[i];
+					if(tecla.x > 0){
+						if((x > tecla.x)&&(x < tecla.x + tecla.ancho)&&	(y > tecla.y)&&(y< tecla.y + tecla.alto))
+						{
+							break;	
+						}
+					}
+				}
+				if(i<teclas_array.length)
+				{
+					alert(i);
+				}
+			}
 			window.onload = function()
 			{
 				canvas = document.getElementById("miCanvas");
@@ -141,6 +192,9 @@
 					if(ctx)
 					{
 						teclado();
+						pintaPalabra();
+						cadalso(errores);
+						canvas.addEventListener("click",selecciona,false);
 					} 
 					else 
 					{
@@ -152,7 +206,7 @@
 	</head>
 
 	<body>
-		<h1>Juego del Ahorcado</h1>
+		<h1>Ahorcado CANVAS</h1>
 		<canvas id="miCanvas" width="960px" height="450px">
 			Tu navegador no soporta CANVAS
 		</canvas>
